@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "boosteriferous", "boosteriferous.csproj", "{B3374CA6-4D28-44A9-A374-47AB92FEEACA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3374CA6-4D28-44A9-A374-47AB92FEEACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3374CA6-4D28-44A9-A374-47AB92FEEACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3374CA6-4D28-44A9-A374-47AB92FEEACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3374CA6-4D28-44A9-A374-47AB92FEEACA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = boosteriferous.csproj
+	EndGlobalSection
+EndGlobal
