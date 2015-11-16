@@ -77,7 +77,7 @@ namespace boosteriferous.UI
 				{
 					mcf.resetSettings();
 				}
-				if (GUILayout.Button("Add", nSegments < mcf.maxSegments ? mBtnStyle : mGreyBtnStyle) && nSegments < mcf.maxSegments)
+				if (GUILayout.Button("Add", nSegments < mcf.getMaxSegments ? mBtnStyle : mGreyBtnStyle) && nSegments < mcf.getMaxSegments)
 				{
 					mcf.segSettings.Add(1.0);
 					mcf.segFractions.Add(0.05);

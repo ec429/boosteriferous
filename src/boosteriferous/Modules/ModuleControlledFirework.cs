@@ -6,7 +6,7 @@ namespace boosteriferous.Modules
 {
 	public interface IControlledFirework
 	{
-		int maxSegments { get; }
+		int getMaxSegments { get; }
 		List<double> segOptions { get; }
 		List<double> segSettings { get; set; }
 		List<double> segFractions { get; set; }
@@ -20,7 +20,8 @@ namespace boosteriferous.Modules
 	public class ModuleControlledFirework : ModuleEngines, IPartCostModifier, IControlledFirework
 	{
 		[KSPField()]
-		public int maxSegments { get; set; }
+		public int maxSegments;
+		public int getMaxSegments { get { return this.maxSegments; } }
 		public List<double> segOptions { get; set; }
 		public List<double> segSettings { get; set; }
 		public List<double> segFractions { get; set; }
@@ -189,7 +190,8 @@ namespace boosteriferous.Modules
 	public class ModuleControlledFireworkFX : ModuleEnginesFX, IPartCostModifier, IControlledFirework
 	{
 		[KSPField()]
-		public int maxSegments { get; set; }
+		public int maxSegments;
+		public int getMaxSegments { get { return this.maxSegments; } }
 		public List<double> segOptions { get; set; }
 		public List<double> segSettings { get; set; }
 		public List<double> segFractions { get; set; }
