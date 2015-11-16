@@ -4,6 +4,23 @@ using UnityEngine;
 
 namespace boosteriferous.Modules
 {
+	public class ModuleThrustTermination : PartModule
+	{
+		[KSPField(isPersistant=true)]
+		public bool thrustTerminated = false;
+		[KSPAction("Terminate Thrust", KSPActionGroup.Abort)]
+		public void terminateThrust(KSPActionParam param)
+		{
+			if (param.type == KSPActionType.Activate)
+				Events["terminateThrust"].Invoke();
+		}
+		[KSPEvent(name = "terminateThrust", guiName = "Terminate Thrust", guiActive = true, guiActiveEditor = false)]
+		public void terminateThrust()
+		{
+			thrustTerminated = true;
+		}
+	}
+
 	public class ModuleControlledFirework : PartModule, IPartCostModifier
 	{
 		[KSPField()]
@@ -152,24 +169,33 @@ namespace boosteriferous.Modules
 		private int lastSegIndex = -1;
 		public override void OnFixedUpdate()
 		{
-			double solidFuel, maxSolidFuel;
-			getSolidFuel(out solidFuel, out maxSolidFuel);
-			if (maxSolidFuel > 1e-3)
+			IFireworkEngine fe = part.FindModuleImplementing<IFireworkEngine>();
+			if (fe != null)
 			{
-				double fraction = 1.0 - (solidFuel / maxSolidFuel);
-				int segIndex = 0;
-				foreach (double sF in segFractions)
+				bool thrustTerminated = part.FindModulesImplementing<ModuleThrustTermination>().Exists(m => m.thrustTerminated);
+				double solidFuel, maxSolidFuel;
+				getSolidFuel(out solidFuel, out maxSolidFuel);
+				if (thrustTerminated)
 				{
-					if (sF > fraction) break;
-					segIndex++;
-					fraction -= sF;
+					fe.setThrust(0.0);
 				}
-				segIndex = Math.Min(segIndex, segSettings.Count - 1);
-				IFireworkEngine fe = part.FindModuleImplementing<IFireworkEngine>();
-				fe.setThrust(segSettings[segIndex]);
-				if (segIndex != lastSegIndex)
-					Logging.Log(String.Format("entered segment {0}, throttle = {1}%", segIndex, segSettings[segIndex] * 100.0));
-				lastSegIndex = segIndex;
+				else if (maxSolidFuel > 1e-3)
+				{
+					double fraction = 1.0 - (solidFuel / maxSolidFuel);
+					int segIndex = 0;
+					foreach (double sF in segFractions)
+					{
+						if (sF > fraction) break;
+						segIndex++;
+						fraction -= sF;
+					}
+					segIndex = Math.Min(segIndex, segSettings.Count - 1);
+					double throttle = segSettings[segIndex];
+					fe.setThrust(throttle);
+					if (segIndex != lastSegIndex)
+						Logging.Log(String.Format("entered segment {0}, throttle = {1}%", segIndex, throttle * 100.0));
+					lastSegIndex = segIndex;
+				}
 			}
 			base.OnFixedUpdate();
 		}
