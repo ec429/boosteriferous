@@ -33,7 +33,11 @@ namespace boosteriferous.UI
 
         public override void Window(int id)
         {
-        	if (this.mcf != null)
+            if (!HighLogic.LoadedSceneIsFlight)
+            {
+                base.Hide();
+            }
+			else if (this.mcf != null)
         	{
 				GUILayout.BeginVertical();
 	            int segIndex = 0;

@@ -64,7 +64,11 @@ namespace boosteriferous.UI
 
         public override void Window(int id)
         {
-        	if (this.mcf != null)
+			if (!HighLogic.LoadedSceneIsEditor)
+			{
+				base.Hide();
+			}
+			else if (this.mcf != null)
         	{
         		int nSegments = mcf.segSettings.Count;
 	            GUILayout.BeginVertical();
