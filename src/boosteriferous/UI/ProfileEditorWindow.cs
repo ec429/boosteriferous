@@ -106,7 +106,7 @@ namespace boosteriferous.UI
 					double fraction = segment.Value;
 					GUIStyle vstyle = mSizeStyle;
 					if (fraction < 0)
-						fraction = Math.Max(1.0 - accumFrac, 0.0);
+						fraction = Math.Max(Math.Round(1.0 - accumFrac, 2), 0.0);
 					accumFrac += fraction;
 					if (accumFrac <= 1.0 - (solidFuel / maxSolidFuel))
 						vstyle = mYellowSizeStyle; /* segment entirely before start */

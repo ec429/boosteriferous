@@ -49,7 +49,7 @@ namespace boosteriferous.UI
 					double fraction = segment.Value;
 					GUIStyle vstyle = mValueStyle;
 					if (fraction < 0)
-						fraction = 1.0 - accumFrac;
+						fraction = Math.Round(Math.Max(1.0 - accumFrac, 0.0), 2);
 	            	accumFrac += fraction;
 					if (accumFrac > 1.0)
 						vstyle = mRedValueStyle;
