@@ -81,6 +81,8 @@ namespace boosteriferous.UI
 				{
 					mcf.segSettings.Add(1.0);
 					mcf.segFractions.Add(0.05);
+					/* Changes part cost, we have to let the editor know */
+					mcf.OnTweak();
 				}
 				GUILayout.EndHorizontal();
 	            int segIndex = 0;
@@ -144,6 +146,8 @@ namespace boosteriferous.UI
 					{
 						mcf.segSettings.RemoveAt(toRemove);
 						mcf.segFractions.RemoveAt(Math.Min(toRemove, mcf.segFractions.Count - 1));
+						/* Changes part cost, we have to let the editor know */
+						mcf.OnTweak();
 					}
 					else
 					{

@@ -15,12 +15,13 @@ namespace boosteriferous.Modules
 
 		private boosteriferous.UI.AbstractWindow mProfileWindow;
 
-		/*public ModuleControlledFirework()
+		public void OnTweak()
 		{
-			segOptions = new List<double>();
-			segSettings = new List<double>();
-			segFractions = new List<double>();
-		}*/
+			if (HighLogic.LoadedSceneIsEditor)
+				GameEvents.onEditorShipModified.Fire(EditorLogic.fetch.ship);
+			else
+				Logging.Log("OnTweak called while not in editor!");
+		}
 
 		[KSPEvent(name = "EventEdit", guiName = "Thrust Profile", guiActive = true, guiActiveEditor = true)]
 		public void EventEdit()
@@ -146,6 +147,8 @@ namespace boosteriferous.Modules
 			segSettings = new List<Double>();
 			segSettings.Add(1.0);
 			segFractions = new List<Double>();
+			/* Changes part cost, we have to let the editor know */
+			OnTweak();
 		}
 		private int lastSegIndex = -1;
 		public override void OnFixedUpdate()
