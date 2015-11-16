@@ -7,8 +7,8 @@ namespace boosteriferous.UI
     public class ProfileDisplayWindow : AbstractWindow
     {
 		private GUIStyle mKeyStyle, mValueStyle, mRedValueStyle;
-		private boosteriferous.Modules.ModuleControlledFirework mcf;
-		public ProfileDisplayWindow (boosteriferous.Modules.ModuleControlledFirework mcf)
+		private boosteriferous.Modules.IControlledFirework mcf;
+		public ProfileDisplayWindow (boosteriferous.Modules.IControlledFirework mcf)
             : base(Guid.NewGuid(), String.Format("Thrust Profile"), new Rect(200, 100, 300, 300), WindowAlign.Floating)
         {
 			this.mcf = mcf;

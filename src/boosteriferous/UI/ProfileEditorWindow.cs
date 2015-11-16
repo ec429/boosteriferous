@@ -7,8 +7,8 @@ namespace boosteriferous.UI
     public class ProfileEditorWindow : AbstractWindow
     {
 		private GUIStyle mRowKeyStyle, mKeyStyle, mThrottleStyle, mSizeStyle, mRedSizeStyle, mYellowSizeStyle, mBtnStyle, mTinyBtnStyle, mGreyBtnStyle;
-		private boosteriferous.Modules.ModuleControlledFirework mcf;
-		public ProfileEditorWindow (boosteriferous.Modules.ModuleControlledFirework mcf)
+		private boosteriferous.Modules.IControlledFirework mcf;
+		public ProfileEditorWindow (boosteriferous.Modules.IControlledFirework mcf)
             : base(Guid.NewGuid(), String.Format("Thrust Profile"), new Rect(200, 100, 300, 400), WindowAlign.Floating)
         {
 			this.mcf = mcf;
