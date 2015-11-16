@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text;
 
 namespace boosteriferous.Modules
 {
@@ -19,6 +20,10 @@ namespace boosteriferous.Modules
 		{
 			thrustTerminated = true;
 		}
+		public override string GetInfo()
+        {
+            return "Engine has Thrust Termination Ports";
+        }
 	}
 
 	public class ModuleControlledFirework : PartModule, IPartCostModifier
@@ -198,6 +203,23 @@ namespace boosteriferous.Modules
 				}
 			}
 			base.OnFixedUpdate();
+		}
+		public override string GetInfo()
+        {
+            var info = new StringBuilder();
+
+            info.AppendLine("Editable Thrust Profile");
+            info.AppendFormat("Max. Segments: {0}", maxSegments).AppendLine();
+            info.Append("Thrust Options:");
+            bool first = true;
+            foreach (double opt in segOptions)
+            {
+				if (!first) info.Append(",");
+				first = false;
+				info.AppendFormat(" {0:F0}%", opt * 100.0);
+            }
+            info.AppendLine();
+			return info.ToString().TrimEnd(Environment.NewLine.ToCharArray());
 		}
 	}
 
