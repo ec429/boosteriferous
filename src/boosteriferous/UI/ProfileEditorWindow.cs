@@ -84,6 +84,7 @@ namespace boosteriferous.UI
 				double solidFuel, maxSolidFuel;
 				mcf.getSolidFuel(out solidFuel, out maxSolidFuel);
 				double flowRate = mcf.nominalFlowRate;
+				int toRemove = -1;
 				foreach (KeyValuePair<double, double> segment in mcf.segments())
 	            {
 					GUILayout.BeginHorizontal();
@@ -125,10 +126,26 @@ namespace boosteriferous.UI
 						mcf.segFractions[segIndex] = Math.Round(Math.Min(fraction + 0.05, 1.0), 2);
 					}
 					GUILayout.EndHorizontal();
+					if (GUILayout.Button("x", mTinyBtnStyle))
+					{
+						toRemove = segIndex;
+					}
 	            	GUILayout.EndHorizontal();
 	            	segIndex++;
 	            }
 	            GUILayout.EndVertical();
+				if (toRemove >= 0)
+				{
+					if (nSegments > 1)
+					{
+						mcf.segSettings.RemoveAt(toRemove);
+						mcf.segFractions.RemoveAt(Math.Min(toRemove, mcf.segFractions.Count - 1));
+					}
+					else
+					{
+						mcf.resetSettings();
+					}
+				}
             }
             else
 			{
