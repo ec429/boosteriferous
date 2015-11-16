@@ -8,7 +8,6 @@ namespace boosteriferous.Modules
 	{
 		[KSPField()]
 		public int maxSegments;
-		public int getMaxSegments { get { return this.maxSegments; } }
 		public List<double> segOptions;
 		public List<double> segSettings;
 		public List<double> segFractions;
