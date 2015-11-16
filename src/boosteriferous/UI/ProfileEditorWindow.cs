@@ -76,7 +76,7 @@ namespace boosteriferous.UI
 				if (GUILayout.Button("Add", nSegments < mcf.maxSegments ? mBtnStyle : mGreyBtnStyle) && nSegments < mcf.maxSegments)
 				{
 					mcf.segSettings.Add(1.0);
-					mcf.segFractions.Add(0.0);
+					mcf.segFractions.Add(0.05);
 				}
 				GUILayout.EndHorizontal();
 	            int segIndex = 0;
