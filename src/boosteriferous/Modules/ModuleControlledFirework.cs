@@ -90,6 +90,11 @@ namespace boosteriferous.Modules
 		}
 		private void listSave(string name, List<double> l, ConfigNode into)
 		{
+			if (l == null)
+			{
+				Logging.Log(name + " is null");
+				return;
+			}
 			ConfigNode node = new ConfigNode(name);
 			foreach (double d in l)
 			{
@@ -254,6 +259,11 @@ namespace boosteriferous.Modules
 		}
 		private void listSave(string name, List<double> l, ConfigNode into)
 		{
+			if (l == null)
+			{
+				Logging.Log(name + " is null");
+				return;
+			}
 			ConfigNode node = new ConfigNode(name);
 			foreach (double d in l)
 			{
