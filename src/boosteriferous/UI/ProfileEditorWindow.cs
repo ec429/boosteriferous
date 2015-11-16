@@ -94,12 +94,12 @@ namespace boosteriferous.UI
 					GUILayout.BeginHorizontal(GUILayout.Width(60));
 					if (GUILayout.Button("<", mTinyBtnStyle))
 					{
-						mcf.segSettings[segIndex] = mcf.segOptions[Math.Max(tIndex - 1, 0)];
+						mcf.segSettings[segIndex] = mcf.segOptions[Math.Min(tIndex + 1, mcf.segOptions.Count -1)];
 					}
 					GUILayout.Label(String.Format("{0:F0}%", thrust * 100.0), mThrottleStyle);
 					if (GUILayout.Button(">", mTinyBtnStyle))
 					{
-						mcf.segSettings[segIndex] = mcf.segOptions[Math.Min(tIndex + 1, mcf.segOptions.Count -1)];
+						mcf.segSettings[segIndex] = mcf.segOptions[Math.Max(tIndex - 1, 0)];
 					}
 					GUILayout.EndHorizontal();
 					double fraction = segment.Value;
