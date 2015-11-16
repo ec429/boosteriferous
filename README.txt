@@ -6,8 +6,9 @@ It allows you to configure the thrust profile of solid rocket boosters, giving
  more nuanced control than the 'Thrust Limiter' slider.  However, you still
  have to work out what you want ahead of time and set it up in the VAB/SPH -
  you can't throttle these solids in real time!
-Note that Boosteriferous completely overrides the 'Thrust Limiter' slider;
- that setting will have no effect on engines which support thrust profiles.
+Note that Boosteriferous removes the 'Thrust Limiter' slider - that setting
+ will have no effect on engines which support thrust profiles.  You don't get
+ to have a thrust profile and then scale it by 63.5%...
 
 Boosteriferous is currently in alpha test.
 

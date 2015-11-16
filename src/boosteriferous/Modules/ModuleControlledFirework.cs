@@ -181,6 +181,11 @@ namespace boosteriferous.Modules
 
 	public class ModuleFireworkEngines : ModuleEngines, IFireworkEngine
 	{
+		public override void OnAwake()
+		{
+			Fields["thrustPercentage"].guiActiveEditor = false;
+			base.OnAwake();
+		}
 		public double maxSolidFuelUsage { get {
 			foreach (Propellant p in propellants)
 			{
@@ -199,6 +204,11 @@ namespace boosteriferous.Modules
 	}
 	public class ModuleFireworkEnginesFX : ModuleEnginesFX, IFireworkEngine
 	{
+		public override void OnAwake()
+		{
+			Fields["thrustPercentage"].guiActiveEditor = false;
+			base.OnAwake();
+		}
 		public double maxSolidFuelUsage { get {
 			foreach (Propellant p in propellants)
 			{
