@@ -39,9 +39,23 @@ namespace boosteriferous.Modules
 		public void OnTweak()
 		{
 			if (HighLogic.LoadedSceneIsEditor)
+			{
+				// propagate to symmetric parts
+				foreach (Part p in part.symmetryCounterparts)
+				{
+					foreach (ModuleControlledFirework m in p.FindModulesImplementing<ModuleControlledFirework>())
+					{
+						m.segSettings = new List<double>(segSettings);
+						m.segFractions = new List<double>(segFractions);
+					}
+				}
+				// trigger vessel cost recalculation
 				GameEvents.onEditorShipModified.Fire(EditorLogic.fetch.ship);
+			}
 			else
+			{
 				Logging.Log("OnTweak called while not in editor!");
+			}
 		}
 
 		[KSPEvent(name = "EventEdit", guiName = "Thrust Profile", guiActive = true, guiActiveEditor = true)]
@@ -168,7 +182,6 @@ namespace boosteriferous.Modules
 			segSettings = new List<Double>();
 			segSettings.Add(1.0);
 			segFractions = new List<Double>();
-			/* Changes part cost, we have to let the editor know */
 			OnTweak();
 		}
 		private int lastSegIndex = -1;

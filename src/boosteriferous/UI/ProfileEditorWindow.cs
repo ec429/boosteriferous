@@ -81,7 +81,6 @@ namespace boosteriferous.UI
 				{
 					mcf.segSettings.Add(1.0);
 					mcf.segFractions.Add(0.05);
-					/* Changes part cost, we have to let the editor know */
 					mcf.OnTweak();
 				}
 				GUILayout.EndHorizontal();
@@ -102,11 +101,13 @@ namespace boosteriferous.UI
 					if (GUILayout.Button("<", mTinyBtnStyle))
 					{
 						mcf.segSettings[segIndex] = mcf.segOptions[Math.Min(tIndex + 1, mcf.segOptions.Count -1)];
+						mcf.OnTweak();
 					}
 					GUILayout.Label(String.Format("{0:F0}%", thrust * 100.0), mThrottleStyle);
 					if (GUILayout.Button(">", mTinyBtnStyle))
 					{
 						mcf.segSettings[segIndex] = mcf.segOptions[Math.Max(tIndex - 1, 0)];
+						mcf.OnTweak();
 					}
 					GUILayout.EndHorizontal();
 					double fraction = segment.Value;
@@ -125,11 +126,13 @@ namespace boosteriferous.UI
 					if (GUILayout.Button("<", mTinyBtnStyle) && moreSegs)
 					{
 						mcf.segFractions[segIndex] = Math.Round(Math.Max(fraction - 0.05, 0.05), 2);
+						mcf.OnTweak();
 					}
 					GUILayout.Label(String.Format("{0}% ({1:F1}s)", fraction * 100.0, duration), vstyle);
 					if (GUILayout.Button(">", mTinyBtnStyle) && moreSegs)
 					{
 						mcf.segFractions[segIndex] = Math.Round(Math.Min(fraction + 0.05, 1.0), 2);
+						mcf.OnTweak();
 					}
 					GUILayout.EndHorizontal();
 					if (GUILayout.Button("x", mTinyBtnStyle))
@@ -146,7 +149,6 @@ namespace boosteriferous.UI
 					{
 						mcf.segSettings.RemoveAt(toRemove);
 						mcf.segFractions.RemoveAt(Math.Min(toRemove, mcf.segFractions.Count - 1));
-						/* Changes part cost, we have to let the editor know */
 						mcf.OnTweak();
 					}
 					else
