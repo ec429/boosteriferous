@@ -18,7 +18,10 @@ namespace boosteriferous.Modules
 		[KSPEvent(name = "terminateThrust", guiName = "Terminate Thrust", guiActive = true, guiActiveEditor = false)]
 		public void terminateThrust()
 		{
-			thrustTerminated = true;
+			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
+				m.Shutdown();
+			foreach (ModuleEnginesFX m in part.FindModulesImplementing<ModuleEnginesFX>())
+				m.Shutdown();
 		}
 		public override string GetInfo()
         {
@@ -26,266 +29,78 @@ namespace boosteriferous.Modules
         }
 	}
 
-	public class ModuleControlledFirework : PartModule, IPartCostModifier
+	public class ModuleControlledFirework : PartModule
 	{
 		[KSPField()]
-		public int maxSegments;
-		public List<double> segOptions;
-		public List<double> segSettings;
-		public List<double> segFractions;
+		public float minThrottle = 0f;
+		[KSPField()]
+		public float rampWidth = 0.01f;
+		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down point"),
+		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
+		public float throttleDownPoint = 100.0f;
+		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down amount"),
+		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
+		public float throttleDownAmount = 50.0f;
+		[KSPField()]
+		public float maxThrust; // Must be the original maxThrust of this part's ModuleEngines[FX]
 
-		private boosteriferous.UI.AbstractWindow mProfileWindow;
-
-		public void OnTweak()
+		private void recalcThrustCurve(BaseField f, object o)
 		{
-			if (HighLogic.LoadedSceneIsEditor)
+			float tdp = 1f - throttleDownPoint / 100f, tda = throttleDownAmount / 100f;
+			Debug.Log(String.Format("[bfer] Recalculating thrust curve: tdp = {0:F3}, tda = {1:F3}", tdp, tda));
+			// Have to multiply curve points by this to scale maxThrust (almost) correctly
+			float timeScale = (1f - tdp) + (tda > 0f ? tdp / tda : 0f);
+			FloatCurve fc = new FloatCurve();
+			// Curve is backwards, because that's how thrustCurve works
+			fc.Add(0f, tda * timeScale, 0f, 0f);
+			fc.Add(1f - tdp - rampWidth, tda * timeScale, 0f, 0f);
+			fc.Add(1f - tdp + rampWidth, timeScale, 0f, 0f);
+			fc.Add(1f, timeScale, 0f, 0f);
+			Debug.Log(String.Format("[bfer] timeScale = {0:F3}, maxThrust = {1:F3}", timeScale, maxThrust / timeScale));
+			// Apply to the engine
+			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
 			{
-				// propagate to symmetric parts
-				foreach (Part p in part.symmetryCounterparts)
-				{
-					foreach (ModuleControlledFirework m in p.FindModulesImplementing<ModuleControlledFirework>())
-					{
-						m.segSettings = new List<double>(segSettings);
-						m.segFractions = new List<double>(segFractions);
-					}
-				}
-				// trigger vessel cost recalculation
-				GameEvents.onEditorShipModified.Fire(EditorLogic.fetch.ship);
+				m.thrustCurve = fc;
+				m.useThrustCurve = true;
+				m.maxThrust = maxThrust / timeScale;
+				// Have to update maxFuelFlow as well
+				m.maxFuelFlow = m.maxThrust / (m.atmosphereCurve.Evaluate(0f) * m.g);
+				Debug.Log(String.Format("[bfer] Applied to ME; maxFuelFlow = {0:F3}", m.maxFuelFlow));
 			}
-			else
+			// The engine might be a ModuleEnginesFX instead
+			foreach (ModuleEnginesFX m in part.FindModulesImplementing<ModuleEnginesFX>())
 			{
-				Logging.Log("OnTweak called while not in editor!");
+				m.thrustCurve = fc;
+				m.useThrustCurve = true;
+				m.maxThrust = maxThrust / timeScale;
+				m.maxFuelFlow = m.maxThrust / (m.atmosphereCurve.Evaluate(0f) * m.g);
+				Debug.Log(String.Format("[bfer] Applied to MEF; maxFuelFlow = {0:F3}", m.maxFuelFlow));
 			}
 		}
 
-		[KSPEvent(name = "EventEdit", guiName = "Thrust Profile", guiActive = true, guiActiveEditor = true)]
-		public void EventEdit()
-        {
-			if (mProfileWindow == null)
-			{
-				if (HighLogic.LoadedSceneIsEditor)
-				{
-					mProfileWindow = new boosteriferous.UI.ProfileEditorWindow(this);
-                }
-                else
-                {
-                	mProfileWindow = new boosteriferous.UI.ProfileDisplayWindow(this);
-                }
-            }
-            mProfileWindow.Show();
-        }
-		public float GetModuleCost(float defaultCost)
+		public override void OnAwake()
 		{
-			if (segSettings == null)
-				return defaultCost;
-			// Add 15% of base part cost per segment
-			return part.partInfo.cost * 0.15f * (segSettings.Count - 1);
+			UI_FloatRange tdaRange = (UI_FloatRange)this.Fields["throttleDownAmount"].uiControlEditor;
+			tdaRange.minValue = (float)minThrottle;
+			tdaRange.onFieldChanged = recalcThrustCurve;
+			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
+			tdpRange.onFieldChanged = recalcThrustCurve;
+			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
+				m.Fields["thrustPercentage"].guiActiveEditor = false;
+			foreach (ModuleEnginesFX m in part.FindModulesImplementing<ModuleEnginesFX>())
+				m.Fields["thrustPercentage"].guiActiveEditor = false;
+			recalcThrustCurve(null, null);
 		}
-		private void listLoad(ConfigNode node, List<double> into, string what)
+
+		public override void OnLoad(ConfigNode node)
 		{
-			foreach (string val in node.GetValues("val"))
-			{
-				double d;
-				if (Double.TryParse(val, out d))
-					into.Add(d);
-				else
-					Logging.Log(String.Format("Bad {0} {1}", what, val));
-			}
-		}
-		public override void OnLoad (ConfigNode node)
-		{
-			segOptions = new List<double>();
-			if (node.HasNode("segOptions"))
-			{
-				listLoad(node.GetNode("segOptions"), segOptions, "segOption");
-			}
-			else
-			{
-				segOptions.Add(1.0);
-			}
-			segSettings = new List<double>();
-			if (node.HasNode("segSettings"))
-			{
-				listLoad(node.GetNode("segSettings"), segSettings, "segSetting");
-			}
-			else
-			{
-				segSettings.Add(1.0);
-			}
-			segFractions = new List<double>();
-			if (node.HasNode("segFractions"))
-			{
-				listLoad(node.GetNode("segFractions"), segFractions, "segFraction");
-			}
 			base.OnLoad(node);
+			this.OnAwake();
 		}
-		private void listSave(string name, List<double> l, ConfigNode into)
-		{
-			if (l == null)
-			{
-				Logging.Log(name + " is null");
-				return;
-			}
-			ConfigNode node = new ConfigNode(name);
-			foreach (double d in l)
-			{
-				node.AddValue("val", d);
-			}
-			into.AddNode(node);
-		}
-		public override void OnSave (ConfigNode node)
-		{
-			listSave("segOptions", segOptions, node);
-			listSave("segSettings", segSettings, node);
-			listSave("segFractions", segFractions, node);
-			base.OnSave(node);
-		}
-		public void getSolidFuel(out double amount, out double maxAmount)
-		{
-			amount = 0;
-			maxAmount = 0;
-			foreach(PartResource pr in part.Resources)
-			{
-				if (pr.resourceName.Equals("SolidFuel"))
-				{
-					amount += pr.amount;
-					maxAmount += pr.maxAmount;
-				}
-			}
-		}
-		public double nominalFlowRate { get {
-			IFireworkEngine fe = part.FindModuleImplementing<IFireworkEngine>();
-			return fe.maxSolidFuelUsage;
-		}}
-		public List<KeyValuePair<double, double>> segments()
-		{
-			List<KeyValuePair<double, double>> rv = new List<KeyValuePair<double, double>>();
-			int segIndex = 0;
-			foreach (double setting in segSettings)
-			{
-				if (segIndex < segFractions.Count)
-					rv.Add(new KeyValuePair<double, double>(setting, segFractions[segIndex]));
-				else
-					rv.Add(new KeyValuePair<double, double>(setting, -1.0));
-				segIndex++;
-			}
-			return rv;
-		}
-		public int indexOfOption(double value)
-		{
-			if (segOptions.Contains(value))
-				return segOptions.IndexOf(value);
-			return -1;
-		}
-		public void resetSettings()
-		{
-			segSettings = new List<Double>();
-			segSettings.Add(1.0);
-			segFractions = new List<Double>();
-			OnTweak();
-		}
-		private int lastSegIndex = -1;
-		public override void OnFixedUpdate()
-		{
-			IFireworkEngine fe = part.FindModuleImplementing<IFireworkEngine>();
-			if (fe != null)
-			{
-				bool thrustTerminated = part.FindModulesImplementing<ModuleThrustTermination>().Exists(m => m.thrustTerminated);
-				double solidFuel, maxSolidFuel;
-				getSolidFuel(out solidFuel, out maxSolidFuel);
-				if (thrustTerminated)
-				{
-					fe.setThrust(0.0);
-				}
-				else if (maxSolidFuel > 1e-3)
-				{
-					double fraction = 1.0 - (solidFuel / maxSolidFuel);
-					int segIndex = 0;
-					foreach (double sF in segFractions)
-					{
-						if (sF > fraction) break;
-						segIndex++;
-						fraction -= sF;
-					}
-					segIndex = Math.Min(segIndex, segSettings.Count - 1);
-					double throttle = segSettings[segIndex];
-					fe.setThrust(throttle);
-					if (segIndex != lastSegIndex)
-						Logging.Log(String.Format("entered segment {0}, throttle = {1}%", segIndex, throttle * 100.0));
-					lastSegIndex = segIndex;
-				}
-			}
-			base.OnFixedUpdate();
-		}
+
 		public override string GetInfo()
         {
-            var info = new StringBuilder();
-
-            info.AppendLine("Editable Thrust Profile");
-            info.AppendFormat("Max. Segments: {0}", maxSegments).AppendLine();
-            info.Append("Thrust Options:");
-            bool first = true;
-            foreach (double opt in segOptions)
-            {
-				if (!first) info.Append(",");
-				first = false;
-				info.AppendFormat(" {0:F0}%", opt * 100.0);
-            }
-            info.AppendLine();
-			return info.ToString().TrimEnd(Environment.NewLine.ToCharArray());
-		}
-	}
-
-	public interface IFireworkEngine
-	{
-		double maxSolidFuelUsage { get; }
-		void setThrust(double throttle);
-	}
-
-	public class ModuleFireworkEngines : ModuleEngines, IFireworkEngine
-	{
-		public override void OnAwake()
-		{
-			Fields["thrustPercentage"].guiActiveEditor = false;
-			base.OnAwake();
-		}
-		public double maxSolidFuelUsage { get {
-			foreach (Propellant p in propellants)
-			{
-				if (p.name.Equals("SolidFuel"))
-					return getMaxFuelFlow(p);
-			}
-			Logging.Log("No propellants matched!");
-			return 1.0;
-		}}
-
-		public void setThrust(double throttle)
-		{
-			thrustPercentage = (float)throttle * 100.0f;
-			UpdateThrottle();
-		}
-	}
-	public class ModuleFireworkEnginesFX : ModuleEnginesFX, IFireworkEngine
-	{
-		public override void OnAwake()
-		{
-			Fields["thrustPercentage"].guiActiveEditor = false;
-			base.OnAwake();
-		}
-		public double maxSolidFuelUsage { get {
-			foreach (Propellant p in propellants)
-			{
-				if (p.name.Equals("SolidFuel"))
-					return getMaxFuelFlow(p);
-			}
-			Logging.Log("No propellants matched!");
-			return 1.0;
-		}}
-
-		public void setThrust(double throttle)
-		{
-			thrustPercentage = (float)throttle * 100.0f;
-			UpdateThrottle();
+            return "Adjustable Thrust Profile";
 		}
 	}
 }

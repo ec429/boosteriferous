@@ -36,15 +36,18 @@
       <HintPath>..\lib\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>..\lib\KSPUtil.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\lib\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\ModuleControlledFirework.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="UI\AbstractWindow.cs" />
-    <Compile Include="UI\ProfileDisplayWindow.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="UI\ProfileEditorWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
