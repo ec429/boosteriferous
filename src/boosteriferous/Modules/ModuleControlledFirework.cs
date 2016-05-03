@@ -19,7 +19,12 @@ namespace boosteriferous.Modules
 		public void terminateThrust()
 		{
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
+			{
+				m.allowRestart = false;
+				m.allowShutdown = true;
 				m.Flameout("Thrust terminated");
+				m.Shutdown();
+			}
 		}
 		public override string GetInfo()
         {
