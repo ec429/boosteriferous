@@ -34,7 +34,7 @@ namespace boosteriferous
 		}
 		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
 		{
-			float tdp = 1f - mcf.throttleDownPoint / 100f, tda = mcf.throttleDownAmount / 100f;
+			float tdp = mcf.throttleDownPoint / 100f, tda = mcf.throttleDownAmount / 100f;
 			Debug.Log(String.Format("[bfer] Recalculating thrust curve: tdp = {0:F3}, tda = {1:F3}", tdp, tda));
 			// Have to multiply curve points by this to scale maxThrust (almost) correctly
 			timeScale = (1f - tdp) + (tda > 0f ? tdp / tda : 0f);
