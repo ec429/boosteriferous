@@ -46,26 +46,27 @@ namespace boosteriferous.Modules
 		public float throttleDownAmount = 50.0f;
 		[KSPField()]
 		public float maxThrust; // Must be the original maxThrust of this part's ModuleEngines[FX]
-
-		public void recalcTypeStep(out FloatCurve fc, out float timeScale)
-		{
-			float tdp = 1f - throttleDownPoint / 100f, tda = throttleDownAmount / 100f;
-			Debug.Log(String.Format("[bfer] Recalculating thrust curve: tdp = {0:F3}, tda = {1:F3}", tdp, tda));
-			// Have to multiply curve points by this to scale maxThrust (almost) correctly
-			timeScale = (1f - tdp) + (tda > 0f ? tdp / tda : 0f);
-			fc = new FloatCurve();
-			// Curve is backwards, because that's how thrustCurve works
-			fc.Add(0f, tda * timeScale, 0f, 0f);
-			fc.Add(1f - tdp - rampWidth, tda * timeScale, 0f, 0f);
-			fc.Add(1f - tdp + rampWidth, timeScale, 0f, 0f);
-			fc.Add(1f, timeScale, 0f, 0f);
-		}
+		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Profile Type"),
+		 UI_ChooseOption(scene = UI_Scene.Editor, affectSymCounterparts = UI_Scene.All)]
+        public string profileTypeName;
 
 		private void recalcThrustCurve(BaseField f, object o)
 		{
+			ProfileShape ps;
+			if (profileTypeName == null)
+			{
+				Debug.Log("[bfer] profileTypeName is null");
+				return;
+			}
+			if (!Core.Instance.profiles.TryGetValue(profileTypeName, out ps))
+			{
+				Debug.Log(String.Format("[bfer] No such ProfileShape '{0}'", profileTypeName));
+				return;
+			}
+			ps.setFieldVisibility(this);
 			FloatCurve fc;
 			float timeScale;
-			recalcTypeStep(out fc, out timeScale);
+			ps.recalcCurve(this, out fc, out timeScale);
 			Debug.Log(String.Format("[bfer] timeScale = {0:F3}, maxThrust = {1:F3}", timeScale, maxThrust / timeScale));
 			// Apply to the engine
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
@@ -86,8 +87,34 @@ namespace boosteriferous.Modules
 			tdaRange.onFieldChanged = recalcThrustCurve;
 			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
 			tdpRange.onFieldChanged = recalcThrustCurve;
+			UI_ChooseOption ptnChoose = (UI_ChooseOption)this.Fields["profileTypeName"].uiControlEditor;
+			ptnChoose.onFieldChanged = recalcThrustCurve;
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
 				m.Fields["thrustPercentage"].guiActiveEditor = false;
+			BaseField field = Fields["profileTypeName"];
+			Dictionary<string, ProfileShape> availableProfiles = new Dictionary<string, ProfileShape>();
+			foreach (ProfileShape ps in Core.Instance.profiles.Values)
+			{
+				if (ps.isAvailable(this))
+				{
+					availableProfiles.Add(ps.name, ps);
+				}
+			}
+			switch (availableProfiles.Count)
+            {
+                case 0:
+                    throw new InvalidProgramException("No profiles available");
+                case 1:
+                    field.guiActiveEditor = false;
+                    profileTypeName = new List<string>(availableProfiles.Keys)[0];
+                    Debug.Log(String.Format("[bfer] Forcing profileTypeName = {0}", profileTypeName));
+                    break;
+                default:
+                    field.guiActiveEditor = true;
+                    UI_ChooseOption range = (UI_ChooseOption)field.uiControlEditor;
+                    range.options = new List<string>(availableProfiles.Keys).ToArray();
+                    break;
+            }
 			recalcThrustCurve(null, null);
 		}
 
