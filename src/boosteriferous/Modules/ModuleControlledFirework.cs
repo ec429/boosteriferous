@@ -19,9 +19,7 @@ namespace boosteriferous.Modules
 		public void terminateThrust()
 		{
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
-				m.Shutdown();
-			foreach (ModuleEnginesFX m in part.FindModulesImplementing<ModuleEnginesFX>())
-				m.Shutdown();
+				m.Flameout("Thrust terminated");
 		}
 		public override string GetInfo()
         {
@@ -65,16 +63,7 @@ namespace boosteriferous.Modules
 				m.maxThrust = maxThrust / timeScale;
 				// Have to update maxFuelFlow as well
 				m.maxFuelFlow = m.maxThrust / (m.atmosphereCurve.Evaluate(0f) * m.g);
-				Debug.Log(String.Format("[bfer] Applied to ME; maxFuelFlow = {0:F3}", m.maxFuelFlow));
-			}
-			// The engine might be a ModuleEnginesFX instead
-			foreach (ModuleEnginesFX m in part.FindModulesImplementing<ModuleEnginesFX>())
-			{
-				m.thrustCurve = fc;
-				m.useThrustCurve = true;
-				m.maxThrust = maxThrust / timeScale;
-				m.maxFuelFlow = m.maxThrust / (m.atmosphereCurve.Evaluate(0f) * m.g);
-				Debug.Log(String.Format("[bfer] Applied to MEF; maxFuelFlow = {0:F3}", m.maxFuelFlow));
+				Debug.Log(String.Format("[bfer] Applied; maxFuelFlow = {0:F3}", m.maxFuelFlow));
 			}
 		}
 
@@ -86,8 +75,6 @@ namespace boosteriferous.Modules
 			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
 			tdpRange.onFieldChanged = recalcThrustCurve;
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
-				m.Fields["thrustPercentage"].guiActiveEditor = false;
-			foreach (ModuleEnginesFX m in part.FindModulesImplementing<ModuleEnginesFX>())
 				m.Fields["thrustPercentage"].guiActiveEditor = false;
 			recalcThrustCurve(null, null);
 		}
