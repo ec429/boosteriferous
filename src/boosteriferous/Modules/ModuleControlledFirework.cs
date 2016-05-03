@@ -35,7 +35,7 @@ namespace boosteriferous.Modules
 		public float rampWidth = 0.01f;
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down point"),
 		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
-		public float throttleDownPoint = 100.0f;
+		public float throttleDownPoint = 0.0f;
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down amount"),
 		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
 		public float throttleDownAmount = 50.0f;
