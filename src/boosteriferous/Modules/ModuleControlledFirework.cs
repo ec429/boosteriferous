@@ -47,18 +47,25 @@ namespace boosteriferous.Modules
 		[KSPField()]
 		public float maxThrust; // Must be the original maxThrust of this part's ModuleEngines[FX]
 
-		private void recalcThrustCurve(BaseField f, object o)
+		public void recalcTypeStep(out FloatCurve fc, out float timeScale)
 		{
 			float tdp = 1f - throttleDownPoint / 100f, tda = throttleDownAmount / 100f;
 			Debug.Log(String.Format("[bfer] Recalculating thrust curve: tdp = {0:F3}, tda = {1:F3}", tdp, tda));
 			// Have to multiply curve points by this to scale maxThrust (almost) correctly
-			float timeScale = (1f - tdp) + (tda > 0f ? tdp / tda : 0f);
-			FloatCurve fc = new FloatCurve();
+			timeScale = (1f - tdp) + (tda > 0f ? tdp / tda : 0f);
+			fc = new FloatCurve();
 			// Curve is backwards, because that's how thrustCurve works
 			fc.Add(0f, tda * timeScale, 0f, 0f);
 			fc.Add(1f - tdp - rampWidth, tda * timeScale, 0f, 0f);
 			fc.Add(1f - tdp + rampWidth, timeScale, 0f, 0f);
 			fc.Add(1f, timeScale, 0f, 0f);
+		}
+
+		private void recalcThrustCurve(BaseField f, object o)
+		{
+			FloatCurve fc;
+			float timeScale;
+			recalcTypeStep(out fc, out timeScale);
 			Debug.Log(String.Format("[bfer] timeScale = {0:F3}, maxThrust = {1:F3}", timeScale, maxThrust / timeScale));
 			// Apply to the engine
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
