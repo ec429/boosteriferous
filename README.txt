@@ -38,6 +38,8 @@ So for instance, if Point is 60 and Amount is 25, and the booster's original
 thrust is 100kN, it will burn the first 40% of its fuel at full thrust (100kN)
 then the remainder at one-quarter thrust, i.e. 25kN.
 
+Requires tech General Rocketry to unlock.
+
 One caveat to note: the Amount is based on the part's total fuel capacity; if
  you reduce the part's SolidFuel resource in the VAB/SPH, you will effectively
  chop off the beginning of your thrust profile.
