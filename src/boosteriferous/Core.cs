@@ -11,6 +11,7 @@ namespace boosteriferous
 		public abstract void setFieldVisibility(ModuleControlledFirework mcf);
 		public abstract void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale);
 		public string techRequired = null;
+		public float costFactor = 0f;
 		public bool isAvailable(ModuleControlledFirework mcf)
 		{
 			if (!string.IsNullOrEmpty(techRequired) && ResearchAndDevelopment.GetTechnologyState(techRequired) != RDTech.State.Available)
@@ -113,7 +114,7 @@ namespace boosteriferous
 				string name = cn.GetValue("name");
 				if (!profiles.ContainsKey(name))
 				{
-					Debug.Log(String.Format("No such BoosteriferousProfileShape '{0}'", name));
+					Debug.LogErrorFormat("No such BoosteriferousProfileShape '{0}'", name);
 					continue;
 				}
 				ProfileShape ps = profiles[name];
@@ -124,8 +125,15 @@ namespace boosteriferous
 				if (cn.HasValue("isDefault"))
 				{
 					int isDefault;
-					if (int.TryParse(cn.GetValue("isDefault"), out isDefault) && isDefault != 0)
+					if (!int.TryParse(cn.GetValue("isDefault"), out isDefault))
+						Debug.LogWarningFormat("Malformed isdefault '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("isDefault"), name);
+					else if (isDefault != 0)
 						defaultProfile = name;
+				}
+				if (cn.HasValue("costFactor"))
+				{
+					if (!float.TryParse(cn.GetValue("costFactor"), out ps.costFactor))
+						Debug.LogWarningFormat("Malformed costFactor '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("costFactor"), name);
 				}
 			}
 		}

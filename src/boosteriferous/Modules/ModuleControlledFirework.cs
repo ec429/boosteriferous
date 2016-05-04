@@ -32,7 +32,7 @@ namespace boosteriferous.Modules
         }
 	}
 
-	public class ModuleControlledFirework : PartModule
+	public class ModuleControlledFirework : PartModule, IPartCostModifier
 	{
 		[KSPField()]
 		public float minThrottle = 0f;
@@ -50,19 +50,25 @@ namespace boosteriferous.Modules
 		 UI_ChooseOption(scene = UI_Scene.Editor, affectSymCounterparts = UI_Scene.All)]
         public string profileTypeName = Core.Instance.defaultProfile;
 
-		private void recalcThrustCurve(BaseField f, object o)
-		{
+        private ProfileShape getProfileType()
+        {
 			ProfileShape ps;
 			if (profileTypeName == null)
 			{
 				Debug.Log("[bfer] profileTypeName is null");
-				return;
+				return null;
 			}
 			if (!Core.Instance.profiles.TryGetValue(profileTypeName, out ps))
 			{
 				Debug.Log(String.Format("[bfer] No such ProfileShape '{0}'", profileTypeName));
-				return;
+				return null;
 			}
+			return ps;
+        }
+
+		private void recalcThrustCurve(BaseField f, object o)
+		{
+			ProfileShape ps = getProfileType();
 			ps.setFieldVisibility(this);
 			FloatCurve fc;
 			float timeScale;
@@ -79,6 +85,23 @@ namespace boosteriferous.Modules
 				Debug.Log(String.Format("[bfer] Applied; maxFuelFlow = {0:F3}", m.maxFuelFlow));
 			}
 		}
+
+		#region IPartCostModifier implementation
+
+		public float GetModuleCost(float defaultCost, ModifierStagingSituation sit)
+		{
+			ProfileShape ps = getProfileType();
+			if (ps == null)
+				return 0f;
+			return defaultCost * ps.costFactor;
+		}
+
+		public ModifierChangeWhen GetModuleCostChangeWhen()
+		{
+			return ModifierChangeWhen.FIXED;
+		}
+
+		#endregion
 
 		public override void OnAwake()
 		{
