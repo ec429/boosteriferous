@@ -40,15 +40,15 @@ namespace boosteriferous.Modules
 		public float rampWidth = 0.01f;
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down point"),
 		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
-		public float throttleDownPoint = 0.0f;
+		public float throttleDownPoint = 50f;
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down amount"),
 		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
-		public float throttleDownAmount = 50.0f;
+		public float throttleDownAmount = 100f;
 		[KSPField()]
 		public float maxThrust; // Must be the original maxThrust of this part's ModuleEngines[FX]
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Profile Type"),
 		 UI_ChooseOption(scene = UI_Scene.Editor, affectSymCounterparts = UI_Scene.All)]
-        public string profileTypeName;
+        public string profileTypeName = "Flat";
 
 		private void recalcThrustCurve(BaseField f, object o)
 		{
