@@ -21,7 +21,15 @@ Boosteriferous is licensed under the GNU General Public License, version 2.
 Thrust Profiles
 ---------------
 
-A thrust profile consists of two parts: Throttle Down Point and Throttle Down
+Flat
+~~~~
+The Flat thrust profile is just the simple thrust limiter as present in stock;
+the booster will run at the selected thrust level (Throttle Down Amount) for
+its entire burn.
+
+Step
+~~~~
+The Step profile has two parameters: Throttle Down Point and Throttle Down
 Amount.  The booster will run at full thrust until it reaches the Throttle
 Down Point, defined as a fraction of remaining propellant.  At this point, it
 will reduce thrust to Throttle Down Amount.  Both values are percentages.
@@ -30,9 +38,9 @@ So for instance, if Point is 60 and Amount is 25, and the booster's original
 thrust is 100kN, it will burn the first 40% of its fuel at full thrust (100kN)
 then the remainder at one-quarter thrust, i.e. 25kN.
 
-One caveat to note: the fractions are based on the part's total fuel capacity;
- if you reduce the part's SolidFuel resource in the VAB/SPH, you will
- effectively chop off the beginning of your thrust profile.
+One caveat to note: the Amount is based on the part's total fuel capacity; if
+ you reduce the part's SolidFuel resource in the VAB/SPH, you will effectively
+ chop off the beginning of your thrust profile.
 
 
 Interop with Info Mods
