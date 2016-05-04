@@ -48,7 +48,7 @@ namespace boosteriferous.Modules
 		public float maxThrust; // Must be the original maxThrust of this part's ModuleEngines[FX]
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Profile Type"),
 		 UI_ChooseOption(scene = UI_Scene.Editor, affectSymCounterparts = UI_Scene.All)]
-        public string profileTypeName = "Flat";
+        public string profileTypeName = Core.Instance.defaultProfile;
 
 		private void recalcThrustCurve(BaseField f, object o)
 		{
@@ -102,11 +102,14 @@ namespace boosteriferous.Modules
 			}
 			switch (availableProfiles.Count)
             {
-                case 0:
-                    throw new InvalidProgramException("No profiles available");
+                case 0: // If nothing appears available, just use the default
+                    profileTypeName = Core.Instance.defaultProfile;
+					field.guiActiveEditor = false;
+                    Debug.Log(String.Format("[bfer] Defaulting profileTypeName = {0}", profileTypeName));
+                    break;
                 case 1:
+					profileTypeName = new List<string>(availableProfiles.Keys)[0];
                     field.guiActiveEditor = false;
-                    profileTypeName = new List<string>(availableProfiles.Keys)[0];
                     Debug.Log(String.Format("[bfer] Forcing profileTypeName = {0}", profileTypeName));
                     break;
                 default:

@@ -11,11 +11,8 @@ namespace boosteriferous
 		public abstract void setFieldVisibility(ModuleControlledFirework mcf);
 		public abstract void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale);
 		public string techRequired = null;
-		public virtual bool alwaysAvailable { get { return false; } }
 		public bool isAvailable(ModuleControlledFirework mcf)
 		{
-			if (alwaysAvailable)
-				return true;
 			if (!string.IsNullOrEmpty(techRequired) && ResearchAndDevelopment.GetTechnologyState(techRequired) != RDTech.State.Available)
 				return false;
 			return true;
@@ -37,7 +34,6 @@ namespace boosteriferous
 
 	public class ProfileFlat : ProfileShape
 	{
-		public override bool alwaysAvailable { get { return true; } }
 		public override string name { get { return "Flat"; } }
 		public override void setFieldVisibility(ModuleControlledFirework mcf)
 		{
@@ -97,6 +93,8 @@ namespace boosteriferous
 			addProfile(new ProfileStep());
 		}
 
+		public string defaultProfile = "Flat";
+
 		public Dictionary<string, ProfileShape> profiles;
 		private void addProfile(ProfileShape ps)
 		{
@@ -122,6 +120,12 @@ namespace boosteriferous
 				if (cn.HasValue("techRequired"))
 				{
 					ps.techRequired = cn.GetValue("techRequired");
+				}
+				if (cn.HasValue("isDefault"))
+				{
+					int isDefault;
+					if (int.TryParse(cn.GetValue("isDefault"), out isDefault) && isDefault != 0)
+						defaultProfile = name;
 				}
 			}
 		}
