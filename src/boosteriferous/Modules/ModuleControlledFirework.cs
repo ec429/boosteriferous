@@ -69,7 +69,18 @@ namespace boosteriferous.Modules
 		private void recalcThrustCurve(BaseField f, object o)
 		{
 			ProfileShape ps = getProfileType();
+			if (ps == null)
+				return;
+
 			ps.setFieldVisibility(this);
+			UI_FloatRange tdaRange = (UI_FloatRange)this.Fields["throttleDownAmount"].uiControlEditor;
+			tdaRange.minValue = (float)minThrottle * ps.minThrottleFactor;
+			tdaRange.onFieldChanged = recalcThrustCurve;
+			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
+			tdpRange.onFieldChanged = recalcThrustCurve;
+			UI_ChooseOption ptnChoose = (UI_ChooseOption)this.Fields["profileTypeName"].uiControlEditor;
+			ptnChoose.onFieldChanged = recalcThrustCurve;
+
 			FloatCurve fc;
 			float timeScale;
 			ps.recalcCurve(this, out fc, out timeScale);
@@ -105,15 +116,6 @@ namespace boosteriferous.Modules
 
 		public override void OnAwake()
 		{
-			UI_FloatRange tdaRange = (UI_FloatRange)this.Fields["throttleDownAmount"].uiControlEditor;
-			tdaRange.minValue = (float)minThrottle;
-			tdaRange.onFieldChanged = recalcThrustCurve;
-			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
-			tdpRange.onFieldChanged = recalcThrustCurve;
-			UI_ChooseOption ptnChoose = (UI_ChooseOption)this.Fields["profileTypeName"].uiControlEditor;
-			ptnChoose.onFieldChanged = recalcThrustCurve;
-			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
-				m.Fields["thrustPercentage"].guiActiveEditor = false;
 			BaseField field = Fields["profileTypeName"];
 			Dictionary<string, ProfileShape> availableProfiles = new Dictionary<string, ProfileShape>();
 			foreach (ProfileShape ps in Core.Instance.profiles.Values)
@@ -140,7 +142,11 @@ namespace boosteriferous.Modules
                     UI_ChooseOption range = (UI_ChooseOption)field.uiControlEditor;
                     range.options = new List<string>(availableProfiles.Keys).ToArray();
                     break;
-            }
+			}
+
+			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
+				m.Fields["thrustPercentage"].guiActiveEditor = false;
+
 			recalcThrustCurve(null, null);
 		}
 

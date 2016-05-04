@@ -12,6 +12,7 @@ namespace boosteriferous
 		public abstract void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale);
 		public string techRequired = null;
 		public float costFactor = 0f;
+		public float minThrottleFactor = 1f;
 		public bool isAvailable(ModuleControlledFirework mcf)
 		{
 			if (!string.IsNullOrEmpty(techRequired) && ResearchAndDevelopment.GetTechnologyState(techRequired) != RDTech.State.Available)
@@ -134,6 +135,11 @@ namespace boosteriferous
 				{
 					if (!float.TryParse(cn.GetValue("costFactor"), out ps.costFactor))
 						Debug.LogWarningFormat("[bfer] Malformed costFactor '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("costFactor"), name);
+				}
+				if (cn.HasValue("minThrottleFactor"))
+				{
+					if (!float.TryParse(cn.GetValue("minThrottleFactor"), out ps.minThrottleFactor))
+						Debug.LogWarningFormat("[bfer] Malformed minThrottleFactor '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("minThrottleFactor"), name);
 				}
 			}
 		}
