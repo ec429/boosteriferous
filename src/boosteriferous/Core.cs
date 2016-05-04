@@ -73,8 +73,8 @@ namespace boosteriferous
 			fc = new FloatCurve();
 			// Curve is backwards, because that's how thrustCurve works
 			fc.Add(0f, tda * timeScale, 0f, 0f);
-			fc.Add(1f - tdp - mcf.rampWidth, tda * timeScale, 0f, 0f);
-			fc.Add(1f - tdp + mcf.rampWidth, timeScale, 0f, 0f);
+			fc.Add(tdp - mcf.rampWidth, tda * timeScale, 0f, 0f);
+			fc.Add(tdp + mcf.rampWidth, timeScale, 0f, 0f);
 			fc.Add(1f, timeScale, 0f, 0f);
 		}
 	}
