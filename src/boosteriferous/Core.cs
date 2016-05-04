@@ -44,7 +44,7 @@ namespace boosteriferous
 		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
 		{
 			float tda = mcf.throttleDownAmount / 100f;
-			Debug.Log(String.Format("[bfer] Recalculating thrust curve: flat, tda = {0:F3}", tda));
+			Debug.LogFormat("[bfer] Recalculating thrust curve: flat, tda = {0:F3}", tda);
 			timeScale = tda > 0f ? 1f / tda : 0f;
 			fc = new FloatCurve();
 			// Curve is backwards, because that's how thrustCurve works
@@ -64,7 +64,7 @@ namespace boosteriferous
 		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
 		{
 			float tdp = mcf.throttleDownPoint / 100f, tda = mcf.throttleDownAmount / 100f;
-			Debug.Log(String.Format("[bfer] Recalculating thrust curve: step, tdp = {0:F3}, tda = {1:F3}", tdp, tda));
+			Debug.LogFormat("[bfer] Recalculating thrust curve: step, tdp = {0:F3}, tda = {1:F3}", tdp, tda);
 			// Have to multiply curve points by this to scale maxThrust (almost) correctly
 			timeScale = (1f - tdp) + (tda > 0f ? tdp / tda : 0f);
 			fc = new FloatCurve();
@@ -108,13 +108,13 @@ namespace boosteriferous
 			{
 				if (!cn.HasValue("name"))
 				{
-					Debug.Log("No name in a BoosteriferousProfileShape node");
+					Debug.Log("[bfer] No name in a BoosteriferousProfileShape node");
 					continue;
 				}
 				string name = cn.GetValue("name");
 				if (!profiles.ContainsKey(name))
 				{
-					Debug.LogErrorFormat("No such BoosteriferousProfileShape '{0}'", name);
+					Debug.LogErrorFormat("[bfer] No such BoosteriferousProfileShape '{0}'", name);
 					continue;
 				}
 				ProfileShape ps = profiles[name];
@@ -126,14 +126,14 @@ namespace boosteriferous
 				{
 					int isDefault;
 					if (!int.TryParse(cn.GetValue("isDefault"), out isDefault))
-						Debug.LogWarningFormat("Malformed isdefault '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("isDefault"), name);
+						Debug.LogWarningFormat("[bfer] Malformed isdefault '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("isDefault"), name);
 					else if (isDefault != 0)
 						defaultProfile = name;
 				}
 				if (cn.HasValue("costFactor"))
 				{
 					if (!float.TryParse(cn.GetValue("costFactor"), out ps.costFactor))
-						Debug.LogWarningFormat("Malformed costFactor '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("costFactor"), name);
+						Debug.LogWarningFormat("[bfer] Malformed costFactor '{0}' in BoosteriferousProfileShape '{1}'", cn.GetValue("costFactor"), name);
 				}
 			}
 		}

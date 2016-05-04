@@ -60,7 +60,7 @@ namespace boosteriferous.Modules
 			}
 			if (!Core.Instance.profiles.TryGetValue(profileTypeName, out ps))
 			{
-				Debug.Log(String.Format("[bfer] No such ProfileShape '{0}'", profileTypeName));
+				Debug.LogFormat("[bfer] No such ProfileShape '{0}'", profileTypeName);
 				return null;
 			}
 			return ps;
@@ -73,7 +73,7 @@ namespace boosteriferous.Modules
 			FloatCurve fc;
 			float timeScale;
 			ps.recalcCurve(this, out fc, out timeScale);
-			Debug.Log(String.Format("[bfer] timeScale = {0:F3}, maxThrust = {1:F3}", timeScale, maxThrust / timeScale));
+			Debug.LogFormat("[bfer] timeScale = {0:F3}, maxThrust = {1:F3}", timeScale, maxThrust / timeScale);
 			// Apply to the engine
 			foreach (ModuleEngines m in part.FindModulesImplementing<ModuleEngines>())
 			{
@@ -82,7 +82,7 @@ namespace boosteriferous.Modules
 				m.maxThrust = maxThrust / timeScale;
 				// Have to update maxFuelFlow as well
 				m.maxFuelFlow = m.maxThrust / (m.atmosphereCurve.Evaluate(0f) * m.g);
-				Debug.Log(String.Format("[bfer] Applied; maxFuelFlow = {0:F3}", m.maxFuelFlow));
+				Debug.LogFormat("[bfer] Applied; maxFuelFlow = {0:F3}", m.maxFuelFlow);
 			}
 		}
 
@@ -128,12 +128,12 @@ namespace boosteriferous.Modules
                 case 0: // If nothing appears available, just use the default
                     profileTypeName = Core.Instance.defaultProfile;
 					field.guiActiveEditor = false;
-                    Debug.Log(String.Format("[bfer] Defaulting profileTypeName = {0}", profileTypeName));
+                    Debug.LogFormat("[bfer] Defaulting profileTypeName = {0}", profileTypeName);
                     break;
                 case 1:
 					profileTypeName = new List<string>(availableProfiles.Keys)[0];
                     field.guiActiveEditor = false;
-                    Debug.Log(String.Format("[bfer] Forcing profileTypeName = {0}", profileTypeName));
+                    Debug.LogFormat("[bfer] Forcing profileTypeName = {0}", profileTypeName);
                     break;
                 default:
                     field.guiActiveEditor = true;
