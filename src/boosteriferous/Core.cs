@@ -119,6 +119,7 @@ namespace boosteriferous
 			profiles = new Dictionary<string, ProfileShape>();
 			addProfile(new ProfileFlat());
 			addProfile(new ProfileStep());
+			addProfile(new ProfileProgressive());
 		}
 
 		public string defaultProfile = "Flat";
