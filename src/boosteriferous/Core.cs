@@ -102,6 +102,46 @@ namespace boosteriferous
 			fc.Add(1f, timeScale * 0.8f, -0.2f, 0f);
 		}
 	}
+
+	public class ProfileLinear : ProfileShape
+	{
+		public override string name { get { return "Linear"; } }
+		public override void setFieldVisibility(ModuleControlledFirework mcf)
+		{
+			setFieldInvisible(mcf, "throttleDownPoint");
+			setFieldVisible(mcf, "throttleDownAmount");
+		}
+		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
+		{
+			float tda = mcf.throttleDownAmount / 100f;
+			// T = tda + P(1-tda); let a = tda, b = 1-tda; then T = a + bP
+			// t = integ[1/(a+bP) dP] = 1/b ln((a+b) / a) = (1/(1-tda)) ln(1/tda) = ln(tda) / (tda-1)
+			// special cases:
+			//  tda = 0 => b = 1 => t = -ln(0) is infinite
+			//  tda = 1 => b = 0 => t = integ[dP] = 1
+			Debug.LogFormat("[bfer] Recalculating thrust curve: linear, tda = {0:F3}", tda);
+			if (tda <= 0f)
+			{
+				Debug.LogErrorFormat("[bfer] bad tda, falling back to 1.0");
+				tda = 1f;
+			}
+			if (tda >= 1f)
+			{
+				// degenerate to Flat
+				timeScale = 1f;
+				fc = new FloatCurve();
+				fc.Add(0f, 1f, 0f, 0f);
+				fc.Add(1f, 1f, 0f, 0f);
+			}
+			else
+			{
+				timeScale = (float)Math.Log(tda) / (tda - 1f);
+				fc = new FloatCurve();
+				fc.Add(0f, timeScale * tda, 0f, (1f - tda));
+				fc.Add(1f, timeScale, (1f - tda), 0f);
+			}
+		}
+	}
 	
 	[KSPAddon(KSPAddon.Startup.Instantly, false)]
 	public class Core : MonoBehaviour
@@ -120,6 +160,7 @@ namespace boosteriferous
 			addProfile(new ProfileFlat());
 			addProfile(new ProfileStep());
 			addProfile(new ProfileProgressive());
+			addProfile(new ProfileLinear());
 		}
 
 		public string defaultProfile = "Flat";
