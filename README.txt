@@ -44,6 +44,14 @@ One caveat to note: the Amount is based on the part's total fuel capacity; if
  you reduce the part's SolidFuel resource in the VAB/SPH, you will effectively
  chop off the beginning of your thrust profile.
 
+Linear
+~~~~~~
+The booster will gradually throttle down from full thrust (at ignition) to the
+specified Throttle Down Amount (at empty).  This means that the thrust-time
+graph is actually an exponential decay.
+
+Requires tech Fuel Systems to unlock.
+
 
 Interop with Info Mods
 ----------------------
