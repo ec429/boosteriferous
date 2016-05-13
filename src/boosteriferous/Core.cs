@@ -266,6 +266,7 @@ namespace boosteriferous
 			addProfile(new ProfileProgressive());
 			addProfile(new ProfileLinear());
 			addProfile(new ProfileStepLinear());
+			addProfile(new ProfileStepLinear2());
 		}
 
 		public string defaultProfile = "Flat";
