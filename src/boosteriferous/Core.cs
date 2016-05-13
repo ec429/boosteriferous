@@ -8,7 +8,12 @@ namespace boosteriferous
 	public abstract class ProfileShape
 	{
 		public abstract string name { get; }
-		public abstract void setFieldVisibility(ModuleControlledFirework mcf);
+		public virtual void setFieldVisibility(ModuleControlledFirework mcf)
+		{
+			setFieldInvisible(mcf, "throttleDownPoint");
+			setFieldInvisible(mcf, "throttleDownAmount");
+			setFieldInvisible(mcf, "throttleUpAmount");
+		}
 		public abstract void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale);
 		public bool disable = false;
 		public string techRequired = null;
@@ -42,7 +47,7 @@ namespace boosteriferous
 		public override string name { get { return "Flat"; } }
 		public override void setFieldVisibility(ModuleControlledFirework mcf)
 		{
-			setFieldInvisible(mcf, "throttleDownPoint");
+			base.setFieldVisibility(mcf);
 			setFieldVisible(mcf, "throttleDownAmount");
 		}
 		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
@@ -62,6 +67,7 @@ namespace boosteriferous
 		public override string name { get { return "Step"; } }
 		public override void setFieldVisibility(ModuleControlledFirework mcf)
 		{
+			base.setFieldVisibility(mcf);
 			setFieldVisible(mcf, "throttleDownPoint");
 			setFieldVisible(mcf, "throttleDownAmount");
 		}
@@ -84,11 +90,6 @@ namespace boosteriferous
 	public class ProfileProgressive : ProfileShape
 	{
 		public override string name { get { return "Progressive"; } }
-		public override void setFieldVisibility(ModuleControlledFirework mcf)
-		{
-			setFieldInvisible(mcf, "throttleDownPoint");
-			setFieldInvisible(mcf, "throttleDownAmount");
-		}
 		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
 		{
 			// T = 1 - 0.2P
@@ -108,7 +109,7 @@ namespace boosteriferous
 		public override string name { get { return "Linear"; } }
 		public override void setFieldVisibility(ModuleControlledFirework mcf)
 		{
-			setFieldInvisible(mcf, "throttleDownPoint");
+			base.setFieldVisibility(mcf);
 			setFieldVisible(mcf, "throttleDownAmount");
 		}
 		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
@@ -148,6 +149,7 @@ namespace boosteriferous
 		public override string name { get { return "StepLinear"; } }
 		public override void setFieldVisibility(ModuleControlledFirework mcf)
 		{
+			base.setFieldVisibility(mcf);
 			setFieldVisible(mcf, "throttleDownPoint");
 			setFieldVisible(mcf, "throttleDownAmount");
 		}
@@ -165,10 +167,10 @@ namespace boosteriferous
 				Debug.LogErrorFormat("[bfer] bad tda, falling back to 1.0");
 				tda = 1f;
 			}
-			if (tdp <= 0f)
+			if (tdp <= mcf.rampWidth)
 			{
-				Debug.LogErrorFormat("[bfer] bad tdp, falling back to 1.0");
-				tdp = 1f;
+				Debug.LogErrorFormat("[bfer] bad tdp, falling back to {0:F3}", mcf.rampWidth);
+				tdp = mcf.rampWidth;
 			}
 			if (tda >= 1f)
 			{
@@ -180,10 +182,65 @@ namespace boosteriferous
 			}
 			else
 			{
-				timeScale = tdp * (float)Math.Log(tda) / (1f - tda) + 1f - tdp;
+				timeScale = tdp * (float)Math.Log(tda) / (tda - 1f) + 1f - tdp;
 				fc = new FloatCurve();
 				fc.Add(0f, timeScale, 0f, (1f - tda) / tdp);
 				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (1f - tda) / tdp, 0f);
+				fc.Add(tdp + mcf.rampWidth, timeScale, 0f, 0f);
+				fc.Add(1f, timeScale, 0f, 0f);
+			}
+		}
+	}
+
+	public class ProfileStepLinear2 : ProfileShape
+	{
+		public override string name { get { return "StepLinear2"; } }
+		public override void setFieldVisibility(ModuleControlledFirework mcf)
+		{
+			base.setFieldVisibility(mcf);
+			setFieldVisible(mcf, "throttleDownPoint");
+			setFieldVisible(mcf, "throttleDownAmount");
+			setFieldVisible(mcf, "throttleUpAmount");
+		}
+		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
+		{
+			float tda = mcf.throttleDownAmount / 100f, tdp = mcf.throttleDownPoint / 100f, tua = mcf.throttleUpAmount / 100f;
+			// T = { u - (u-a)P/p [P < p] or 1 [P > p] }, where a = tda, p = tdp, u = tua
+			// t = (p ln (a/u))/(a - u) + (1 - p)
+			// special cases:
+			//  tda = 0 => t is infinite
+			//  tda = 1 => t = 1
+			//  tua = 0 => t is infinite
+			Debug.LogFormat("[bfer] Recalculating thrust curve: step-linear, tda = {0:F3}, tdp = {1:F3}, tua = {2:F3}", tda, tdp, tua);
+			if (tda <= 0f)
+			{
+				Debug.LogErrorFormat("[bfer] bad tda, falling back to 1.0");
+				tda = 1f;
+			}
+			if (tua <= 0f)
+			{
+				Debug.LogErrorFormat("[bfer] bad tua, falling back to 1.0");
+				tua = 1f;
+			}
+			if (tdp <= mcf.rampWidth)
+			{
+				Debug.LogErrorFormat("[bfer] bad tdp, falling back to {0:F3}", mcf.rampWidth);
+				tdp = mcf.rampWidth;
+			}
+			if (tda >= 1f)
+			{
+				// degenerate to Flat
+				timeScale = 1f;
+				fc = new FloatCurve();
+				fc.Add(0f, 1f, 0f, 0f);
+				fc.Add(1f, 1f, 0f, 0f);
+			}
+			else
+			{
+				timeScale = tdp * (float)Math.Log(tda / tua) / (tda - tua) + 1f - tdp;
+				fc = new FloatCurve();
+				fc.Add(0f, timeScale * tua, 0f, (tua - tda) / tdp);
+				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (tua - tda) / tdp, 0f);
 				fc.Add(tdp + mcf.rampWidth, timeScale, 0f, 0f);
 				fc.Add(1f, timeScale, 0f, 0f);
 			}

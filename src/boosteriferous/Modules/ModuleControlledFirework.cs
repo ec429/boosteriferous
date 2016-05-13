@@ -44,6 +44,9 @@ namespace boosteriferous.Modules
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-down amount"),
 		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
 		public float throttleDownAmount = 100f;
+		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Throttle-up amount"),
+		 UI_FloatRange(minValue = 0f, maxValue = 100f, stepIncrement = 1f, affectSymCounterparts = UI_Scene.All, scene = UI_Scene.Editor)]
+		public float throttleUpAmount = 100f;
 		[KSPField()]
 		public float maxThrust; // Must be the original maxThrust of this part's ModuleEngines[FX]
 		[KSPField(isPersistant = true, guiActiveEditor = true, guiActive = true, guiName = "Profile Type"),
@@ -78,6 +81,9 @@ namespace boosteriferous.Modules
 			tdaRange.onFieldChanged = recalcThrustCurve;
 			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
 			tdpRange.onFieldChanged = recalcThrustCurve;
+			UI_FloatRange tuaRange = (UI_FloatRange)this.Fields["throttleUpAmount"].uiControlEditor;
+			tdaRange.minValue = throttleDownAmount;
+			tdaRange.onFieldChanged = recalcThrustCurve;
 			UI_ChooseOption ptnChoose = (UI_ChooseOption)this.Fields["profileTypeName"].uiControlEditor;
 			ptnChoose.onFieldChanged = recalcThrustCurve;
 

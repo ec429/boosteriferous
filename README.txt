@@ -60,6 +60,14 @@ the burn it will gradually throttle back up to full thrust.
 
 Requires tech Adv. Fuel Systems to unlock.
 
+StepLinear2
+~~~~~~~~~~~
+The booster will run at full thrust until it reaches the Throttle Down Point,
+at which it will reduce thrust to Throttle Down Amount.  Over the remainder of
+the burn it will gradually throttle back up to Throttle Up Amount.
+
+Requires tech Meta-Materials to unlock.
+
 
 Interop with Info Mods
 ----------------------
