@@ -82,8 +82,8 @@ namespace boosteriferous.Modules
 			UI_FloatRange tdpRange = (UI_FloatRange)this.Fields["throttleDownPoint"].uiControlEditor;
 			tdpRange.onFieldChanged = recalcThrustCurve;
 			UI_FloatRange tuaRange = (UI_FloatRange)this.Fields["throttleUpAmount"].uiControlEditor;
-			tdaRange.minValue = throttleDownAmount;
-			tdaRange.onFieldChanged = recalcThrustCurve;
+			tuaRange.minValue = throttleDownAmount;
+			tuaRange.onFieldChanged = recalcThrustCurve;
 			UI_ChooseOption ptnChoose = (UI_ChooseOption)this.Fields["profileTypeName"].uiControlEditor;
 			ptnChoose.onFieldChanged = recalcThrustCurve;
 
