@@ -184,8 +184,8 @@ namespace boosteriferous
 			{
 				timeScale = tdp * (float)Math.Log(tda) / (tda - 1f) + 1f - tdp;
 				fc = new FloatCurve();
-				fc.Add(0f, timeScale, 0f, (1f - tda) / tdp);
-				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (1f - tda) / tdp, 0f);
+				fc.Add(0f, timeScale, 0f, (tda - 1f) / tdp);
+				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (tda - 1f) / tdp, 0f);
 				fc.Add(tdp + mcf.rampWidth, timeScale, 0f, 0f);
 				fc.Add(1f, timeScale, 0f, 0f);
 			}
@@ -239,8 +239,8 @@ namespace boosteriferous
 			{
 				timeScale = tdp * (float)Math.Log(tda / tua) / (tda - tua) + 1f - tdp;
 				fc = new FloatCurve();
-				fc.Add(0f, timeScale * tua, 0f, (tua - tda) / tdp);
-				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (tua - tda) / tdp, 0f);
+				fc.Add(0f, timeScale * tua, 0f, (tda - tua) / tdp);
+				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (tda - tua) / tdp, 0f);
 				fc.Add(tdp + mcf.rampWidth, timeScale, 0f, 0f);
 				fc.Add(1f, timeScale, 0f, 0f);
 			}
