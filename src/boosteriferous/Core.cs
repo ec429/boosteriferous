@@ -142,7 +142,54 @@ namespace boosteriferous
 			}
 		}
 	}
-	
+
+	public class ProfileStepLinear : ProfileShape
+	{
+		public override string name { get { return "StepLinear"; } }
+		public override void setFieldVisibility(ModuleControlledFirework mcf)
+		{
+			setFieldVisible(mcf, "throttleDownPoint");
+			setFieldVisible(mcf, "throttleDownAmount");
+		}
+		public override void recalcCurve(ModuleControlledFirework mcf, out FloatCurve fc, out float timeScale)
+		{
+			float tda = mcf.throttleDownAmount / 100f, tdp = mcf.throttleDownPoint / 100f;
+			// T = { 1 - (1-a)P/p [P < p] or 1 [P > p] }, where a = tda, p = tdp
+			// t = (p ln a)/(a - 1) + (1 - p)
+			// special cases:
+			//  tda = 0 => t is infinite
+			//  tda = 1 => t = 1
+			Debug.LogFormat("[bfer] Recalculating thrust curve: step-linear, tda = {0:F3}, tdp = {1:F3}", tda, tdp);
+			if (tda <= 0f)
+			{
+				Debug.LogErrorFormat("[bfer] bad tda, falling back to 1.0");
+				tda = 1f;
+			}
+			if (tdp <= 0f)
+			{
+				Debug.LogErrorFormat("[bfer] bad tdp, falling back to 1.0");
+				tdp = 1f;
+			}
+			if (tda >= 1f)
+			{
+				// degenerate to Flat
+				timeScale = 1f;
+				fc = new FloatCurve();
+				fc.Add(0f, 1f, 0f, 0f);
+				fc.Add(1f, 1f, 0f, 0f);
+			}
+			else
+			{
+				timeScale = tdp * (float)Math.Log(tda) / (1f - tda) + 1f - tdp;
+				fc = new FloatCurve();
+				fc.Add(0f, timeScale, 0f, (1f - tda) / tdp);
+				fc.Add(tdp - mcf.rampWidth, timeScale * tda, (1f - tda) / tdp, 0f);
+				fc.Add(tdp + mcf.rampWidth, timeScale, 0f, 0f);
+				fc.Add(1f, timeScale, 0f, 0f);
+			}
+		}
+	}
+
 	[KSPAddon(KSPAddon.Startup.Instantly, false)]
 	public class Core : MonoBehaviour
 	{
@@ -161,6 +208,7 @@ namespace boosteriferous
 			addProfile(new ProfileStep());
 			addProfile(new ProfileProgressive());
 			addProfile(new ProfileLinear());
+			addProfile(new ProfileStepLinear());
 		}
 
 		public string defaultProfile = "Flat";
