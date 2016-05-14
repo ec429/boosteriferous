@@ -41,8 +41,9 @@ then the remainder at one-quarter thrust, i.e. 25kN.
 Requires tech General Rocketry to unlock.
 
 One caveat to note: the Amount is based on the part's total fuel capacity; if
- you reduce the part's SolidFuel resource in the VAB/SPH, you will effectively
- chop off the beginning of your thrust profile.
+you reduce the part's SolidFuel resource in the VAB/SPH, you will effectively
+chop off the beginning of your thrust profile.  (This caveat also applies to
+all the following profiles.)
 
 Linear
 ~~~~~~
