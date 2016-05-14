@@ -1,12 +1,12 @@
 {
     "NAME":"Boosteriferous",
     "URL":"http://jttlov.no-ip.org/tar/boosteriferous.version",
-    "DOWNLOAD":"http://jttlov.no-ip.org/tar/bfer-0.2.0.zip",
+    "DOWNLOAD":"http://jttlov.no-ip.org/tar/bfer-0.2.1.zip",
     "VERSION":
     {
         "MAJOR":0,
         "MINOR":2,
-        "PATCH":0,
+        "PATCH":1,
         "BUILD":0
     },
     "KSP_VERSION":
