@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -27,14 +27,34 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\lib\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="KSPCore">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\KSPCore.dll</HintPath>
+    </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\KSPUtil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="TDx.TDxInput">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\TDx.TDxInput.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="TrackIRUnity">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\TrackIRUnity.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\lib\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>R:\KSP_1.1.3_dev\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -47,7 +67,5 @@
     <Compile Include="UI\ProfileEditorWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Modules\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>
