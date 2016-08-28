@@ -74,14 +74,19 @@ namespace boosteriferous.Modules
             }
             mProfileWindow.Show();
         }
-		public float GetModuleCost(float defaultCost)
+        public float GetModuleCost(float defaultCost, ModifierStagingSituation sit)
 		{
 			if (segSettings == null)
 				return defaultCost;
 			// Add 15% of base part cost per segment
 			return part.partInfo.cost * 0.15f * (segSettings.Count - 1);
 		}
-		private void listLoad(ConfigNode node, List<double> into, string what)
+        public ModifierChangeWhen GetModuleCostChangeWhen()
+        {
+            return ModifierChangeWhen.FIXED;
+        }
+
+        private void listLoad(ConfigNode node, List<double> into, string what)
 		{
 			foreach (string val in node.GetValues("val"))
 			{
