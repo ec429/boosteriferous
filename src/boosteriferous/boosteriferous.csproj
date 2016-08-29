@@ -27,7 +27,6 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
     <Reference Include="Assembly-CSharp">
       <HintPath>..\lib\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
@@ -42,6 +41,10 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\lib\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>..\lib\mscorlib.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
