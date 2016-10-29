@@ -10,7 +10,7 @@ Note that Boosteriferous removes the 'Thrust Limiter' slider from engines
  which support thrust profiles.  You don't get to have a thrust profile and
  then scale it as well.
 
-Boosteriferous is currently in alpha test.
+Boosteriferous is currently in beta.
 
 Boosteriferous is developed by Edward Cree, who goes by the handle 'soundnfury'
  on IRC and 'ec429' elsewhere; his website is at http://jttlov.no-ip.org.
